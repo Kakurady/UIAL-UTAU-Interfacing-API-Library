@@ -1,6 +1,4 @@
-﻿using zuoanqh.libzut;
-using zuoanqh.libzut.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -64,8 +62,8 @@ namespace zuoanqh.UIAL
     public static string EncodePitchbends(int[] Pitchbends)
     {
       
-      //first fold it into pairs of (pitch, times repeated)
-      List<Pair<int, int>> l = new List<Pair<int, int>>();
+      //Item1 fold it into Tuples of (pitch, times repeated)
+      List<Tuple<int, int>> l = new List<Tuple<int, int>>();
       int current = 0;
       while (current < Pitchbends.Length)
       {
@@ -78,7 +76,7 @@ namespace zuoanqh.UIAL
           count++;
         }
 
-        l.Add(new Pair<int, int>(Pitchbends[current], count));
+        l.Add(new Tuple<int, int>(Pitchbends[current], count));
         current += count;
       }
 
@@ -87,16 +85,16 @@ namespace zuoanqh.UIAL
       foreach (var v in l)
       {
         //convert things back.
-        int val = v.First;
+        int val = v.Item1;
         if (val < 0) val += 4096;//again some magic defined by original encoding algorithm
 
         //segment the two digits out
         ans.Append(CommonReferences.PITCHBEND_ENCODING[val / 64])
           .Append(CommonReferences.PITCHBEND_ENCODING[val % 64]);
 
-        if (v.Second > 2)//if repeated, add that bit.
-          ans.Append("#").Append(v.Second).Append("#");
-        else if (v.Second == 2)//had to do some testing to find this out.
+        if (v.Item2 > 2)//if repeated, add that bit.
+          ans.Append("#").Append(v.Item2).Append("#");
+        else if (v.Item2 == 2)//had to do some testing to find this out.
           ans.Append(ans[ans.Length - 2]).Append(ans[ans.Length - 2]);
       }
 
@@ -116,17 +114,17 @@ namespace zuoanqh.UIAL
 
       while (true)
       {
-        string s;
+        string s = "";
         if (input.Length < 2) break;
         if (input.Length > 2 && input[2] == '#')//for repeated cases
         {
           s = Regex.Match(input, @"..#[\d]+").Value;
-          input = zusp.Drop(input, s.Length + 1);//skip the second "#" mark
+          //input = zusp.Drop(input, s.Length + 1);//skip the Item2 "#" mark
         }//for a "single".
         else
         {
-          s = zusp.Left(input, 2);
-          input = zusp.Drop(input, s.Length);
+          //s = zusp.Left(input, 2);
+          //input = zusp.Drop(input, s.Length);
         }
         segments.Add(s);
       }
@@ -141,8 +139,8 @@ namespace zuoanqh.UIAL
 
         if (s.Contains("#"))//if repeated add that many times.
         {
-          for (int j = 0; j < Convert.ToInt32(zusp.Drop(s, 3)); j++)
-            l.AddLast(i);
+          //for (int j = 0; j < Convert.ToInt32(zusp.Drop(s, 3)); j++)
+          //  l.AddLast(i);
         }
         else//else one time.
           l.AddLast(i);

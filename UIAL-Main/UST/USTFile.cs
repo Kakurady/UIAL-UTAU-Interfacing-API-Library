@@ -1,7 +1,4 @@
-﻿using zuoanqh.libzut;
-using zuoanqh.libzut.Data;
-using zuoanqh.libzut.FileIO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -37,40 +34,40 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public string Version;
 
-    /// <summary>
-    /// Or BPM.
-    /// </summary>
-    public double Tempo { get { return ProjectInfo.GetAsDouble(KEY_TEMPO); } set { ProjectInfo.Set(KEY_TEMPO, value); } }
-    /// <summary>
-    /// Note this is useless on windows. we do however, provide a method converting multi-track files to multiple usts.
-    /// </summary>
-    //public int Tracks;
-    public string ProjectName { get { return ProjectInfo.Get(KEY_PROJECT_NAME); } set { ProjectInfo.Set(KEY_PROJECT_NAME, value); } }
-    /// <summary>
-    /// See class comment for directory meaning.
-    /// </summary>
-    public string VoiceDir { get { return ProjectInfo.Get(KEY_VOICE_DIR); } set { ProjectInfo.Set(KEY_VOICE_DIR, value); } }
-    /// <summary>
-    /// See class comment for directory meaning.
-    /// </summary>
-    public string OutFile { get { return ProjectInfo.Get(KEY_OUT_FILE); } set { ProjectInfo.Set(KEY_OUT_FILE, value); } }
-    /// <summary>
-    /// See class comment for directory meaning.
-    /// </summary>
-    public string CacheDir { get { return ProjectInfo.Get(KEY_CACHE_DIR); } set { ProjectInfo.Set(KEY_CACHE_DIR, value); } }
-    /// <summary>
-    /// The wavtool used.
-    /// </summary>
-    public string Tool1 { get { return ProjectInfo.Get(KEY_TOOL1); } set { ProjectInfo.Set(KEY_TOOL1, value); } }
-    /// <summary>
-    /// The sampler used.
-    /// </summary>
-    public string Tool2 { get { return ProjectInfo.Get(KEY_TOOL2); } set { ProjectInfo.Set(KEY_TOOL2, value); } }
-    /// <summary>
-    /// Whether the project is in edit mode 2.
-    /// <para />You probably want this to be true since mode 2 is the newer edit mode for UTAU. 
-    /// </summary>
-    public bool Mode2 { get { return ProjectInfo.GetAsBoolean(KEY_MODE2); } set { ProjectInfo.Set(KEY_MODE2, value); } }
+    ///// <summary>
+    ///// Or BPM.
+    ///// </summary>
+    //public double Tempo { get { return ProjectInfo.GetAsDouble(KEY_TEMPO); } set { ProjectInfo.Set(KEY_TEMPO, value); } }
+    ///// <summary>
+    ///// Note this is useless on windows. we do however, provide a method converting multi-track files to multiple usts.
+    ///// </summary>
+    ////public int Tracks;
+    //public string ProjectName { get { return ProjectInfo.Get(KEY_PROJECT_NAME); } set { ProjectInfo.Set(KEY_PROJECT_NAME, value); } }
+    ///// <summary>
+    ///// See class comment for directory meaning.
+    ///// </summary>
+    //public string VoiceDir { get { return ProjectInfo.Get(KEY_VOICE_DIR); } set { ProjectInfo.Set(KEY_VOICE_DIR, value); } }
+    ///// <summary>
+    ///// See class comment for directory meaning.
+    ///// </summary>
+    //public string OutFile { get { return ProjectInfo.Get(KEY_OUT_FILE); } set { ProjectInfo.Set(KEY_OUT_FILE, value); } }
+    ///// <summary>
+    ///// See class comment for directory meaning.
+    ///// </summary>
+    //public string CacheDir { get { return ProjectInfo.Get(KEY_CACHE_DIR); } set { ProjectInfo.Set(KEY_CACHE_DIR, value); } }
+    ///// <summary>
+    ///// The wavtool used.
+    ///// </summary>
+    //public string Tool1 { get { return ProjectInfo.Get(KEY_TOOL1); } set { ProjectInfo.Set(KEY_TOOL1, value); } }
+    ///// <summary>
+    ///// The sampler used.
+    ///// </summary>
+    //public string Tool2 { get { return ProjectInfo.Get(KEY_TOOL2); } set { ProjectInfo.Set(KEY_TOOL2, value); } }
+    ///// <summary>
+    ///// Whether the project is in edit mode 2.
+    ///// <para />You probably want this to be true since mode 2 is the newer edit mode for UTAU. 
+    ///// </summary>
+    //public bool Mode2 { get { return ProjectInfo.GetAsBoolean(KEY_MODE2); } set { ProjectInfo.Set(KEY_MODE2, value); } }
 
 
 
@@ -92,7 +89,7 @@ namespace zuoanqh.UIAL.UST
       }
     }
 
-    public DictionaryDataObject ProjectInfo;
+    public IDictionary<string, string> ProjectInfo;
 
     /// <summary>
     /// Creates a ust from (absolute or relative) path given.
@@ -100,7 +97,7 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     /// <param name="fPath"></param>
     public USTFile(string fPath) //
-      : this(ByLineFileIO.ReadFileNoWhitespace(fPath, zuio.GetEncUde(fPath,8192, Encoding.GetEncoding("Shift_JIS"))).ToArray())
+      //: this(ByLineFileIO.ReadFileNoWhitespace(fPath, zuio.GetEncUde(fPath,8192, Encoding.GetEncoding("Shift_JIS"))).ToArray())
     { }
 
     /// <summary>
@@ -111,32 +108,32 @@ namespace zuoanqh.UIAL.UST
     {
       TrackData = new List<List<USTNote>>();
 
-      //split by tracks first. yes, that exists.
-      //thank you c# for providing @.. escaping more escape character is just...
-      List<List<string>> tracks = zusp.ListSplit(data.ToList(), @"\[#TRACKEND\]");
-      List<List<string>> ls = zusp.ListSplit(tracks[0], @"\[#.*\]");
+      ////split by tracks first. yes, that exists.
+      ////thank you c# for providing @.. escaping more escape character is just...
+      //List<List<string>> tracks = zusp.ListSplit(data.ToList(), @"\[#TRACKEND\]");
+      //List<List<string>> ls = zusp.ListSplit(tracks[0], @"\[#.*\]");
 
-      //ls[0] is ust version, we only handled the newest.
-      Version = ls[0][0];
-      //ls[1] is other project info
-      ProjectInfo = new DictionaryDataObject(zusp.ListToDictionary(ls[1], "="));
+      ////ls[0] is ust version, we only handled the newest.
+      //Version = ls[0][0];
+      ////ls[1] is other project info
+      ////ProjectInfo = new DictionaryDataObject(zusp.ListToDictionary(ls[1], "="));
 
-      TrackData.Add(new List<USTNote>());
-      //rest of it is notes of this ust.
-      for (int i = 2; i < ls.Count; i++)
-      {
-        int notenum = i - 2; //LI:when i is 2, it's note 0
-        TrackData[0].Add(new USTNote(ls[i]));
-      }
-      if (tracks.Count > 1)//yes there can be more than 1 tracks. not on windows versions though!
-        foreach (var t in tracks.Skip(1))//much better code after those special cases are gone now...
-          TrackData.Add(zusp.ListSplit(t, @"\[*\]").Select((n) => new USTNote(n)).ToList());
+      //TrackData.Add(new List<USTNote>());
+      ////rest of it is notes of this ust.
+      //for (int i = 2; i < ls.Count; i++)
+      //{
+      //  int notenum = i - 2; //LI:when i is 2, it's note 0
+      //  TrackData[0].Add(new USTNote(ls[i]));
+      //}
+      //if (tracks.Count > 1)//yes there can be more than 1 tracks. not on windows versions though!
+      //  foreach (var t in tracks.Skip(1))//much better code after those special cases are gone now...
+      //    TrackData.Add(zusp.ListSplit(t, @"\[*\]").Select((n) => new USTNote(n)).ToList());
 
-      //now we need to fix portamentos if any.
-      foreach (var track in TrackData)
-        for (int i = 1; i < track.Count; i++)//sliding window of i-1, i
-          if (track[i].Portamento != null && !track[i].Portamento.HasValidPBS1())//note this is [i-1] - [i] because it's relative to [i]
-            track[i].Portamento.PBS[1] = track[i - 1].NoteNum - track[i].NoteNum;
+      ////now we need to fix portamentos if any.
+      //foreach (var track in TrackData)
+      //  for (int i = 1; i < track.Count; i++)//sliding window of i-1, i
+      //    if (track[i].Portamento != null && !track[i].Portamento.HasValidPBS1())//note this is [i-1] - [i] because it's relative to [i]
+      //      track[i].Portamento.PBS[1] = track[i - 1].NoteNum - track[i].NoteNum;
     }
 
     /// <summary>
@@ -148,7 +145,7 @@ namespace zuoanqh.UIAL.UST
     public USTFile(string Version, IDictionary<string, string> ProjectInfo, List<List<USTNote>> TrackData)
     {
       this.Version = Version;
-      this.ProjectInfo = new DictionaryDataObject(ProjectInfo);
+      //this.ProjectInfo = new DictionaryDataObject(ProjectInfo);
       this.TrackData = new List<List<USTNote>>();
       foreach (var t in TrackData)
       {
@@ -185,7 +182,7 @@ namespace zuoanqh.UIAL.UST
     public List<string> ToStringList()
     {
       var ans = new List<string> { "[#VERSION]", Version, "[#SETTING]" };
-      ans.AddRange(ProjectInfo.ToStringList("="));
+      //ans.AddRange(ProjectInfo.ToStringList("="));
 
       foreach (var Notes in TrackData)//adding notes for each track.
       {
@@ -209,7 +206,7 @@ namespace zuoanqh.UIAL.UST
     /// <returns></returns>
     public override string ToString()
     {
-      return zusp.List("\r\n", ToStringList().ToArray()) + "\r\n";
+      return/* zusp.List("\r\n", ToStringList().ToArray()) +*/ "\r\n";
     }
   }
 }

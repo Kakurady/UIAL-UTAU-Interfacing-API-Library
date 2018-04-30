@@ -1,5 +1,4 @@
-﻿using zuoanqh.libzut;
-using System;
+﻿using System;
 using System.Linq;
 
 namespace zuoanqh.UIAL.UST
@@ -85,9 +84,9 @@ namespace zuoanqh.UIAL.UST
     /// <param name="VBRText"></param>
     public Vibrato(string VBRText)
     {
-      Parameters = zusp.SplitAsIs(VBRText, ",")
-        .Select((s) => s.Equals("")?0:Convert.ToDouble(s))
-        .ToArray();
+      //Parameters = zusp.SplitAsIs(VBRText, ",")
+      //  .Select((s) => s.Equals("")?0:Convert.ToDouble(s))
+      //  .ToArray();
     }
 
     /// <summary>
@@ -126,9 +125,10 @@ namespace zuoanqh.UIAL.UST
       double blank = Length - len;
       if (AtTime < blank || AtTime > Length) return 0;//just some house keeping.
 
+      const double PHI = 1.6180339887;
       double rTime = AtTime - blank;//relative time since start of vibrato.
       double unfaded = Pitch * Depth *
-        Math.Sin(((rTime / Cycle + Phase) * zum.PHI));//GO TEAM PHI!!!
+        Math.Sin(((rTime / Cycle + Phase) * PHI));
 
       double percentTime = rTime / len;//percent of whole vibrato time, before fade-in and fade-out
 
@@ -147,7 +147,7 @@ namespace zuoanqh.UIAL.UST
     /// <returns></returns>
     public override string ToString()
     {
-      return zusp.List(" ", Parameters);
+      return "";/* zusp.List(" ", Parameters);*/
     }
   }
 }

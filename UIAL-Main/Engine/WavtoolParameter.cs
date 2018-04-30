@@ -1,5 +1,4 @@
-﻿using zuoanqh.libzut;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using zuoanqh.UIAL.UST;
@@ -110,9 +109,10 @@ namespace zuoanqh.UIAL.Engine
       */
       get
       {
-        return new Envelope(zusp.List(",", Args.Skip(4).Take(7)
-          .Union(Enumerable.Repeat("%", 1))
-          .Union(Args.Skip(12))));
+            //return new Envelope(zusp.List(",", Args.Skip(4).Take(7)
+            //  .Union(Enumerable.Repeat("%", 1))
+            //  .Union(Args.Skip(12))));
+            return new Envelope();
       }
       set
       {
@@ -127,15 +127,15 @@ namespace zuoanqh.UIAL.Engine
     /// </summary>
     public double Length
     {//This is the first one.
-      get { return Convert.ToDouble(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").First); }
-      set { LengthTempoPreUtteranceAdjusted = value + "@" + zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").Second; }
+      get { return 1;/*return Convert.ToDouble(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").First);*/ }
+      set { /*LengthTempoPreUtteranceAdjusted = value + "@" + zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").Second;*/ }
     }
     /// <summary>
     /// Tempo cut out from raw data.
     /// </summary>
     public double Tempo
     {//This is the one in the middle
-      get { return Convert.ToDouble(zusp.CutFirst(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").Second, "+").First); }
+      get { return 140;/*Convert.ToDouble(zusp.CutFirst(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").Second, "+").First);*/ }
       set { LengthTempoPreUtteranceAdjusted = Length + "@" + value + "+" + PreUtteranceAdjusted; }
     }
     /// <summary>
@@ -151,8 +151,8 @@ namespace zuoanqh.UIAL.Engine
     /// </summary>
     public double PreUtteranceAdjusted
     {
-      get { return Convert.ToDouble(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "+").Second); }//this is the one after + sign
-      set { LengthTempoPreUtteranceAdjusted = zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "+").First + "+" + value; }
+      get { return 50; /*Convert.ToDouble(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "+").Second);*/ }//this is the one after + sign
+      set { /*LengthTempoPreUtteranceAdjusted = zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "+").First + "+" + value;*/ }
     }
 
     /// <summary>
@@ -188,7 +188,7 @@ namespace zuoanqh.UIAL.Engine
       double Tempo, double PreUtteranceAdjusted, double OverlapAdjusted, Envelope Envelope)
     {
       Args = new List<string> { OutputFile, InputFile, STPAdjusted + "", Length + "@" + Tempo + "+" + PreUtteranceAdjusted };
-      var l = zusp.Split(Envelope.ToString(), ",").ToList();
+      var l = new string[] { "" }.ToList() ; /* zusp.Split(Envelope.ToString(), ",").ToList();*/
       if (l.Count > 7) l.RemoveAt(7);//remove the stupid percent mark
       Args.AddRange(l);
     }

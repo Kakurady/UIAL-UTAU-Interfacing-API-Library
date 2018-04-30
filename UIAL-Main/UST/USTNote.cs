@@ -1,6 +1,4 @@
-﻿using zuoanqh.libzut;
-using zuoanqh.libzut.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace zuoanqh.UIAL.UST
@@ -80,15 +78,15 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public IReadOnlyDictionary<string, string> Attributes { get { return attributes; } }
 
-    private DictionaryDataObject attributes;
+    private Dictionary<string, string> attributes;
 
     /// <summary>
     /// Must-have attribute. Ticks. Must >= 15.
     /// </summary>
     public int Length
     {
-      get { return attributes.GetAsInt(KEY_LENGTH); }
-      set { attributes.Set(KEY_PREUTTERANCE, value); }
+      get { return 1;/* attributes.GetAsInt(KEY_LENGTH);*/ }
+      set { /*attributes.Set(KEY_PREUTTERANCE, value);*/ }
     }
 
     /// <summary>
@@ -97,7 +95,7 @@ namespace zuoanqh.UIAL.UST
     public string Lyric
     {
       get { return attributes[KEY_LYRIC]; }
-      set { attributes.Set(KEY_PREUTTERANCE, value); }
+      set { /*attributes.Set(KEY_PREUTTERANCE, value);*/ }
     }
     public bool IsRest()
     { return Lyric.Equals("R"); }
@@ -107,8 +105,8 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public int NoteNum
     {
-      get { return attributes.GetAsInt(KEY_NOTENUM); }
-      set { attributes.Set(KEY_NOTENUM, value); }
+      get { return 4; /* attributes.GetAsInt(KEY_NOTENUM);*/ }
+      set { /*attributes.Set(KEY_NOTENUM, value);*/ }
     }
 
     /// <summary>
@@ -116,8 +114,8 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public double PreUtterance
     {
-      get { return attributes.GetAsDouble(KEY_PREUTTERANCE); }
-      set { attributes.Set(KEY_PREUTTERANCE, value); }
+      get { return 0; /*attributes.GetAsDouble(KEY_PREUTTERANCE);*/ }
+      set { /*attributes.Set(KEY_PREUTTERANCE, value);*/ }
     }
 
     /// <summary>
@@ -126,7 +124,7 @@ namespace zuoanqh.UIAL.UST
     public string FlagText
     {
       get { return attributes[KEY_FLAGS]; }
-      set { attributes.Set(KEY_FLAGS, value); }
+      set { /*attributes.Set(KEY_FLAGS, value);*/ }
     }
 
     /// <summary>
@@ -144,16 +142,16 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public int Intensity
     {
-      get { return attributes.GetAsInt(KEY_INTENSITY); }
-      set { attributes.Set(KEY_INTENSITY, value); }
+      get { return 0; /*attributes.GetAsInt(KEY_INTENSITY);*/ }
+      set { /*attributes.Set(KEY_INTENSITY, value)*/; }
     }
     /// <summary>
     /// Percentage. This will be rounded to an integer by UTAU.
     /// </summary>
     public int Modulation
     {
-      get { return attributes.GetAsInt(KEY_MODULATION); }
-      set { attributes.Set(KEY_MODULATION, value); }
+      get { return 0; /* attributes.GetAsInt(KEY_MODULATION); */}
+      set { /*attributes.Set(KEY_MODULATION, value);*/ }
     }
 
     /// <summary>
@@ -161,8 +159,8 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public double VoiceOverlap
     {
-      get { return attributes.GetAsDouble(KEY_VOICEOVERLAP); }
-      set { attributes.Set(KEY_VOICEOVERLAP, value); }
+      get { return 0; /*attributes.GetAsDouble(KEY_VOICEOVERLAP);*/ }
+      set { /*attributes.Set(KEY_VOICEOVERLAP, value);*/ }
     }
 
     /// <summary>
@@ -170,8 +168,8 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public double Velocity
     {
-      get { return attributes.GetAsDouble(KEY_VELOCITY); }
-      set { attributes.Set(KEY_VELOCITY, value); }
+      get { return 0; /*attributes.GetAsDouble(KEY_VELOCITY);*/ }
+      set { /*attributes.Set(KEY_VELOCITY, value);*/ }
     }
     /// <summary>
     /// This allow you to manipulate the velocity with desired factor value instead. This should be between 0.5 (half as long, fastest) to 2 (twice as long, slowest)
@@ -224,7 +222,7 @@ namespace zuoanqh.UIAL.UST
     public USTNote(List<string> list)
     {
       //this.TextRaw = list;
-      this.attributes = new DictionaryDataObject(zusp.ListToDictionary(list, "="));
+      //this.attributes = new DictionaryDataObject(zusp.ListToDictionary(list, "="));
 
       this.Envelope = attributes.ContainsKey(KEY_ENVELOPE) ? new Envelope(attributes[KEY_ENVELOPE]):new Envelope();
       attributes.Remove(KEY_ENVELOPE);
@@ -251,7 +249,7 @@ namespace zuoanqh.UIAL.UST
     /// <param name="NoteNum"></param>
     public USTNote(int Length, string Lyric, int NoteNum)
     {
-      this.attributes = new DictionaryDataObject();
+      //this.attributes = new DictionaryDataObject();
       this.Length = Length;
       this.Lyric = Lyric;
       this.NoteNum = NoteNum;
@@ -289,7 +287,7 @@ namespace zuoanqh.UIAL.UST
     public List<string> ToStringList()
     {
       var ans = new List<string>();
-      ans.AddRange(attributes.ToStringList("="));
+      ans.AddRange(attributes.Values/*attributes.ToStringList("=")*/);
       if (Vibrato != null) ans.Add(Vibrato.ToString());
       if (Portamento != null) ans.AddRange(Portamento.ToStringList());
       ans.Add(Envelope.ToString());
@@ -302,7 +300,7 @@ namespace zuoanqh.UIAL.UST
     /// <returns></returns>
     public override string ToString()
     {
-      return zusp.List("\r\n", ToStringList().ToArray()) + "\r\n";
+      return /*zusp.List("\r\n", ToStringList().ToArray()) +*/ "\r\n";
     }
   }
 }

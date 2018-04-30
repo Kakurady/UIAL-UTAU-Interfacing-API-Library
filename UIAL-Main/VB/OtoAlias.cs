@@ -1,5 +1,4 @@
-﻿using zuoanqh.libzut;
-using System;
+﻿using System;
 using System.Linq;
 
 namespace zuoanqh.UIAL.VB
@@ -41,12 +40,12 @@ namespace zuoanqh.UIAL.VB
 
     public OtoAlias(string s)
     {
-      var t = zusp.CutFirst(s, "=");
-      string[] l = zusp.SplitAsIs(t.Second, ",");
-      numbers = l.Skip(1).Select(n => Convert.ToDouble(n)).ToArray();
-      //TODO Error Handling: l.length==6
-      FName = t.First;
-      Alias = l[0];
+      //var t = zusp.CutFirst(s, "=");
+      //string[] l = zusp.SplitAsIs(t.Second, ",");
+      //numbers = l.Skip(1).Select(n => Convert.ToDouble(n)).ToArray();
+      ////TODO Error Handling: l.length==6
+      //FName = t.First;
+      //Alias = l[0];
     }
 
     /// <summary>

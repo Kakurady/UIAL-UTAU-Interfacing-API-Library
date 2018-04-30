@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using zuoanqh.libzut;
-using zuoanqh.libzut.FileIO;
 
 namespace zuoanqh.UIAL.VB
 {
@@ -23,7 +21,7 @@ namespace zuoanqh.UIAL.VB
     public int ExtrasCount
     { get { return LineCount - AliasCount; } }
 
-    public Oto(string fPath) : this(ByLineFileIO.ReadFileNoWhitespace(fPath, zuio.GetEncUde(fPath)).ToArray())
+    public Oto(string fPath) : this(new string[] { "" }/*ByLineFileIO.ReadFileNoWhitespace(fPath, zuio.GetEncUde(fPath)).ToArray()*/)
     { }
 
     public Oto(string[] Data)
@@ -70,14 +68,14 @@ namespace zuoanqh.UIAL.VB
 
     public string GetCommonPostfix()
     {
-      return zusp.GetCommonPostfix(Aliases.Keys.ToList());
+      return "";/*zusp.GetCommonPostfix(Aliases.Keys.ToList());*/
     }
 
     public void ChangeCommonPostfix(string NewPostfix)
     {
       string postfix = GetCommonPostfix();
       foreach (var a in AliasesOrdered)
-        a.Alias = zusp.Left(a.Alias, a.Alias.Length - postfix.Length);
+        a.Alias = "";/*zusp.Left(a.Alias, a.Alias.Length - postfix.Length);*/
       UpdateAliasesAndExtras();
     }
 
@@ -91,7 +89,7 @@ namespace zuoanqh.UIAL.VB
 
     public override string ToString()
     {
-      return zusp.List("\r\n", ToStringList().ToArray()) + "\r\n";
+      return /*zusp.List("\r\n", ToStringList().ToArray()) +*/ "\r\n";
     }
   }
 }

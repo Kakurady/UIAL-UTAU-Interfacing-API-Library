@@ -1,5 +1,4 @@
-﻿using zuoanqh.libzut;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -130,7 +129,8 @@ namespace zuoanqh.UIAL.UST
     {
       param = new double[10];
 
-      var ls = zusp.SplitAsIs(Data, ",")
+      //var ls = zusp.SplitAsIs(Data, ",")
+      var ls = new string[] { }
         .Select((s) => s.Trim()).ToArray();//gotta trim that string
 
       if (ls.Length < 7) throw new ArgumentException("Malformed envelope, have " + ls.Length + " parts only, requires 7 or more.");
@@ -197,7 +197,7 @@ namespace zuoanqh.UIAL.UST
         l.Add(effectiveP4);
       }
 
-      return zusp.List(",", l.ToArray());
+      return "";/*zusp.List(",", l.ToArray())*/
     }
   }
 }

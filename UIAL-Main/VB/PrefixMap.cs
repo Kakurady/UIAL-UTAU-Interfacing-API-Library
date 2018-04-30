@@ -1,6 +1,4 @@
-﻿using zuoanqh.libzut;
-using zuoanqh.libzut.FileIO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace zuoanqh.UIAL.VB
@@ -15,7 +13,7 @@ namespace zuoanqh.UIAL.VB
     /// </summary>
     public Dictionary<string, string> Map;
 
-    public PrefixMap(string fPath):this(ByLineFileIO.ReadFileNoWhitespace(fPath, zuio.GetEncUde(fPath)).ToArray())
+    public PrefixMap(string fPath):this( new string[] { } /*ByLineFileIO.ReadFileNoWhitespace(fPath, zuio.GetEncUde(fPath)).ToArray()*/)
     { }
 
     /// <summary>
@@ -24,9 +22,9 @@ namespace zuoanqh.UIAL.VB
     /// <param name="Data">Lines in the file. Yes, you need to turn a file into lines. Because stupid windows store framework whatever don't allow main thread to read file</param>
     public PrefixMap(string[] Data)
     {
-      Map = new Dictionary<string, string>();
-      var t = Data.Select((s)=>zusp.Split(s,"\t\t"));
-      foreach (var p in t) Map.Add(p[0], p[1]);
+      //Map = new Dictionary<string, string>();
+      //var t = Data.Select((s)=>zusp.Split(s,"\t\t"));
+      //foreach (var p in t) Map.Add(p[0], p[1]);
     }
 
 
@@ -56,7 +54,7 @@ namespace zuoanqh.UIAL.VB
 
     public override string ToString()
     {
-      return zusp.List("\r\n", CommonReferences.NOTENAMES.Reverse().Select(s => s + "\t\t" + Map[s])) + "\r\n";
+      return /*zusp.List("\r\n", CommonReferences.NOTENAMES.Reverse().Select(s => s + "\t\t" + Map[s])) +*/ "\r\n";
     }
   }
 }

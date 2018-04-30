@@ -1,6 +1,4 @@
-﻿using zuoanqh.libzut;
-using zuoanqh.libzut.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,7 +27,7 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public static readonly CurveSegmentHandler SCurveHandler = (Time, Length, Magnitude) =>
     {//yes. i know. lots of brackets.
-      return ((1 - Math.Cos((zum.Bound(Time, 0, Length) / Length))) / 2) * Magnitude;
+      return ((1 - Math.Cos((Time/*zum.Bound(Time, 0, Length)*/ / Length))) / 2) * Magnitude;
     };
 
     /// <summary>
@@ -37,7 +35,7 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public static readonly CurveSegmentHandler LinearHandler = (Time, Length, Magnitude) =>
     {
-      return (zum.Bound(Time, 0, Length) / Length) * Magnitude;
+      return (Time/*zum.Bound(Time, 0, Length)*/ / Length) * Magnitude;
     };
 
     /// <summary>
@@ -116,17 +114,17 @@ namespace zuoanqh.UIAL.UST
     /// <summary>
     /// All units in ms, default is 0.
     /// </summary>
-    public VirtualArray<double> PBW;
-    public string PBWText { get { return zusp.List(" ", PBW.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray()); } }
+    public double[] PBW;
+    public string PBWText { get { return ""; /*zusp.List(" ", PBW.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray());*/ } }
     /// <summary>
     /// All units are in 10-cents
     /// </summary>
-    public VirtualArray<double> PBY;
-    public string PBYText { get { return zusp.List(" ", PBY.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray()); } }
+    public double[] PBY;
+    public string PBYText { get { return ""; /*zusp.List(" ", PBY.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray());*/ } }
 
-    public VirtualArray<string> PBM;
+    public string[] PBM;
 
-    public string PBMText { get { return zusp.List(" ", PBM.ToArray()); } }
+    public string PBMText { get { return "";/*zusp.List(" ", PBM.ToArray());*/ } }
 
     /// <summary>
     /// Returns the change in a given segment of pitchbend line.
@@ -176,36 +174,36 @@ namespace zuoanqh.UIAL.UST
         {
           if (!PBS.Contains(","))//don't you just love working with legendary code
             this.PBS = new double[] { Convert.ToDouble(PBS), double.NaN };
-          else
-            this.PBS = zusp.Split(PBS, ",").Select((s) => Convert.ToDouble(s)).ToArray();
+          //else
+          //  this.PBS = zusp.Split(PBS, ",").Select((s) => Convert.ToDouble(s)).ToArray();
         }
-        else
-          this.PBS = zusp.Split(PBS, ";").Select((s) => Convert.ToDouble(s)).ToArray();
+        //else
+        //  this.PBS = zusp.Split(PBS, ";").Select((s) => Convert.ToDouble(s)).ToArray();
       }
 
-      var w = zusp.SplitAsIs(PBW, ",")
-        .Select((s) => (s.Equals("")) ? (0) : (Convert.ToDouble(s)))//empty entries means 0. 
-        .ToList();
+      //var w = zusp.SplitAsIs(PBW, ",")
+      //  .Select((s) => (s.Equals("")) ? (0) : (Convert.ToDouble(s)))//empty entries means 0. 
+      //  .ToList();
 
-      var y = zusp.SplitAsIs(PBY, ",")
-        .Select((s) => (s.Equals("")) ? (0) : (Convert.ToDouble(s)))//why though? i wonder.
-        .ToList();
+      //var y = zusp.SplitAsIs(PBY, ",")
+      //  .Select((s) => (s.Equals("")) ? (0) : (Convert.ToDouble(s)))//why though? i wonder.
+      //  .ToList();
 
-      while (y.Count < w.Count - 1) y.Add(0);//-1 because last point must be 0 as far as utau's concern, which is stupid.
+      //while (y.Count < w.Count - 1) y.Add(0);//-1 because last point must be 0 as far as utau's concern, which is stupid.
 
-      var m = zusp.SplitAsIs(PBM, ",").ToList();
+      //var m = zusp.SplitAsIs(PBM, ",").ToList();
 
-      while (m.Count < w.Count) m.Add(PBM_S_CURVE);
+      //while (m.Count < w.Count) m.Add(PBM_S_CURVE);
 
-      //initialize segments
-      for (int i = 0; i < w.Count - 1; i++)//last segment is a special case.
-        Segments.Add(new PortamentoSegment(w[i], y[i], m[i]));
-      Segments.Add(new PortamentoSegment(w[w.Count - 1], 0, m[w.Count - 1]));
+      ////initialize segments
+      //for (int i = 0; i < w.Count - 1; i++)//last segment is a special case.
+      //  Segments.Add(new PortamentoSegment(w[i], y[i], m[i]));
+      //Segments.Add(new PortamentoSegment(w[w.Count - 1], 0, m[w.Count - 1]));
 
       //now fill the virtual arrays.
-      this.PBW = new VirtualArray<double>((i) => (Segments[i].PBW), (i, v) => Segments[i].PBW = v, () => Segments.Count);
-      this.PBY = new VirtualArray<double>((i) => (Segments[i].PBY), (i, v) => Segments[i].PBW = v, () => Segments.Count - 1);
-      this.PBM = new VirtualArray<string>((i) => (Segments[i].PBM), (i, v) => Segments[i].PBM = v, () => Segments.Count);
+      //this.PBW = new VirtualArray<double>((i) => (Segments[i].PBW), (i, v) => Segments[i].PBW = v, () => Segments.Count);
+      //this.PBY = new VirtualArray<double>((i) => (Segments[i].PBY), (i, v) => Segments[i].PBW = v, () => Segments.Count - 1);
+      //this.PBM = new VirtualArray<string>((i) => (Segments[i].PBM), (i, v) => Segments[i].PBM = v, () => Segments.Count);
 
     }
 
@@ -251,7 +249,7 @@ namespace zuoanqh.UIAL.UST
 
     public override string ToString()
     {
-      return zusp.List("\r\n", ToStringList().ToArray()) + "\r\n";
+      return /*zusp.List("\r\n", ToStringList().ToArray()) +*/ "\r\n";
     }
   }
 }

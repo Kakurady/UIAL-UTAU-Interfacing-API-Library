@@ -1,6 +1,4 @@
-﻿using zuoanqh.libzut;
-using zuoanqh.libzut.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -121,7 +119,7 @@ namespace zuoanqh.UIAL.UST
     /// <summary>
     /// Note NaN was used as value if a flag does not have parameter.
     /// </summary>
-    public IReadOnlyList<Pair<string, double>> flags;
+    public IReadOnlyList<Tuple<string, double>> flags;
 
     /// <summary>
     /// 
@@ -131,7 +129,7 @@ namespace zuoanqh.UIAL.UST
     public bool HasFlag(string Flag)
     {
       foreach (var v in flags)
-        if (v.First.Equals(Flag))
+        if (v.Item1.Equals(Flag))
           return true;
       //if not found return false
       return false;
@@ -151,7 +149,7 @@ namespace zuoanqh.UIAL.UST
     public double GetFlagsFirstValue(string Flag)
     {
       foreach (var p in flags)
-        if (p.First.Equals(Flag)) return p.Second;
+        if (p.Item1.Equals(Flag)) return p.Item2;
 
       throw new ArgumentException("Flag not found.");
       //old implementation, might have some use so not deleted.
@@ -171,12 +169,12 @@ namespace zuoanqh.UIAL.UST
     {
       if (HasFlag(Flag))
       {
-        var l = new List<Pair<string, double>>();
+        var l = new List<Tuple<string, double>>();
         bool firstReplaced = false;
         foreach (var f in flags)
         {
-          if (f.First.Equals(Flag) && !firstReplaced)//replace only the first
-            l.Add(new Pair<string, double>(Flag, Value));
+          if (f.Item1.Equals(Flag) && !firstReplaced)//replace only the first
+            l.Add(new Tuple<string, double>(Flag, Value));
           else
             l.Add(f);
         }
@@ -184,7 +182,7 @@ namespace zuoanqh.UIAL.UST
       }
       else
       {//just append it
-        var l = new List<Pair<string, double>>(this.flags) { new Pair<string, double>(Flag, Value) };
+        var l = new List<Tuple<string, double>>(this.flags) { new Tuple<string, double>(Flag, Value) };
         return new Flags(l);
       }
       //if (HasFlag(Flag))
@@ -211,14 +209,14 @@ namespace zuoanqh.UIAL.UST
     /// <returns></returns> 
     public Flags WithoutRepeatedFlags()
     {
-      var ans = new List<Pair<string, double>>();
+      var ans = new List<Tuple<string, double>>();
       HashSet<string> addedFlags = new HashSet<string>();
       //sure, not the most efficient way but works right?
       foreach (var f in flags)
       {
-        if (!addedFlags.Contains(f.First))
+        if (!addedFlags.Contains(f.Item1))
         {
-          addedFlags.Add(f.First);
+          addedFlags.Add(f.Item1);
           ans.Add(f);
         }
       }
@@ -233,7 +231,7 @@ namespace zuoanqh.UIAL.UST
     /// <returns></returns>
     public Flags WithoutFlag(string Flag)
     {
-      return new Flags(flags.Where((s) => !s.First.Equals(Flag)).ToList());
+      return new Flags(flags.Where((s) => !s.Item1.Equals(Flag)).ToList());
     }
 
     private List<string> SegmentNoParamFlags(string input)
@@ -251,7 +249,7 @@ namespace zuoanqh.UIAL.UST
         if (!bestMatch.Equals(""))
         {//we found a known flag this starts with. cut it out & carry on.
           ans.Add(bestMatch);
-          s = zusp.Drop(s, bestMatch.Length);
+          //s = zusp.Drop(s, bestMatch.Length);
         }
         else
         {//something unknown. treat the entire thing as a single flag.
@@ -269,7 +267,7 @@ namespace zuoanqh.UIAL.UST
     public Flags(string Flag)
     {
       this.FlagText = Flag;
-      var flaglist = new List<Pair<string, double>>();
+      var flaglist = new List<Tuple<string, double>>();
 
       string fs = Flag.Trim();
       while (true)//wait for it.....
@@ -278,13 +276,13 @@ namespace zuoanqh.UIAL.UST
         var match = Regex.Match(fs, @"[A-Za-z]+");//extract a letter part that can have multiple flags in it.
         if (match.Success)
         {
-          fs = zusp.Drop(fs, match.Length);//remove the matched part.
+          //fs = zusp.Drop(fs, match.Length);//remove the matched part.
           var matched = match.Value;
-          var matchnumbers = Regex.Match(fs, zusp.RegEx.FLOATING_POINT_NUMBER + "|" + zusp.RegEx.INTEGER);//try to extract a floating point number. if fails, try to extract an integer
+          var matchnumbers = Regex.Match(fs, "|" /*zusp.RegEx.FLOATING_POINT_NUMBER + "|" + zusp.RegEx.INTEGER*/);//try to extract a floating point number. if fails, try to extract an integer
           if (matchnumbers.Success)
           {
             double flagValue = Convert.ToDouble(matchnumbers.Value);
-            fs = zusp.Drop(fs, matchnumbers.Length);
+            //fs = zusp.Drop(fs, matchnumbers.Length);
 
             //the letter part must be ending with a parameter flag, let's see what's our best match.
             string bestMatch = "";
@@ -294,29 +292,29 @@ namespace zuoanqh.UIAL.UST
 
             if (!bestMatch.Equals(""))
             {//it is one of our known flags with parameter
-              matched = zusp.DropLast(matched, bestMatch.Length);//leave that out
+              //matched = zusp.DropLast(matched, bestMatch.Length);//leave that out
 
               if (matched.Length > 0)
               {//segment all no-parameter flags before it
                 flaglist.AddRange(SegmentNoParamFlags(matched)
-                .Select((s) => new Pair<string, double>(s, double.NaN)));
+                .Select((s) => new Tuple<string, double>(s, double.NaN)));
               }
 
-              flaglist.Add(new Pair<string, double>(bestMatch, flagValue));
+              flaglist.Add(new Tuple<string, double>(bestMatch, flagValue));
             }
             else
             {//hmm.... it does not end with any. Let's try to chip away no-parameter flags in the beginning.
               var v = SegmentNoParamFlags(matched);//this will give us a bunch of no-param flags if any, then the last will be a flag with parameter.
               for (int i = 0; i < v.Count - 1; i++)//add first ones
-                flaglist.Add(new Pair<string, double>(v[i], double.NaN));
+                flaglist.Add(new Tuple<string, double>(v[i], double.NaN));
               //add that last.
-              flaglist.Add(new Pair<string, double>(v.Last(), flagValue));
+              flaglist.Add(new Tuple<string, double>(v.Last(), flagValue));
             }
           }
           else
           {//the remainder is all letters. They can be many no-parameter-flag or one.
             flaglist.AddRange(SegmentNoParamFlags(matched)
-              .Select((s) => new Pair<string, double>(s, double.NaN)));
+              .Select((s) => new Tuple<string, double>(s, double.NaN)));
             break;
           }
         }
@@ -337,14 +335,14 @@ namespace zuoanqh.UIAL.UST
     /// This can expose internal data representation and wreck things, hence should not be used unless you absolutely know what you're doing.
     /// </summary>
     /// <param name="list"></param>
-    private Flags(List<Pair<string, double>> list)
+    private Flags(List<Tuple<string, double>> list)
     {//used for efficiency.
       this.flags = list;
       //make up the flag string.
       StringBuilder sb = new StringBuilder();
       foreach (var v in list)
-        sb.Append(v.First)
-          .Append((double.IsNaN(v.Second)) ? ("") : ("" + Math.Round(v.Second, 2)));
+        sb.Append(v.Item1)
+          .Append((double.IsNaN(v.Item2)) ? ("") : ("" + Math.Round(v.Item2, 2)));
       FlagText = sb.ToString();
     }
 
@@ -354,7 +352,7 @@ namespace zuoanqh.UIAL.UST
     /// <param name="Another"></param>
     public Flags(Flags Another)
     {
-      this.flags = new List<Pair<string, double>>(Another.flags);
+      this.flags = new List<Tuple<string, double>>(Another.flags);
       this.FlagText = Another.FlagText;
     }
 
