@@ -105,6 +105,9 @@ namespace zuoanqh.UIAL
     /// Decode the string given to resampler's 13th parameter back to pitchbend magnitudes.
     /// </summary>
     /// <remarks>
+    /// This function expects pitch bend parameter to be well-formed, without
+    /// whitespace or extra characters.
+    /// 
     /// The pitch bend parameter is a kind of run-length encoding, where each
     /// segment is encoded with two characters in a custom base-64 scheme,
     /// giving 4096 levels where negative levels are represented in two's
@@ -120,19 +123,26 @@ namespace zuoanqh.UIAL
     public static int[] DecodePitchbends(string PitchbendString)
     {
 
-      LinkedList<int> l = new LinkedList<int>();
       string input = PitchbendString;
+      List<int> l = new List<int>(input.Length / 2);
 
       int i = 0;
       while (i < input.Length)
       {
         // Step one: parse a run 
         // we expect a run to be two characters...
-        if (i+2 > input.Length) { throw new Exception(); }
+        if (i + 2 > input.Length) {
+          throw new ArgumentException($"Pitch bend segment must be two characters (at position {i})");
+        }
 
         // ...that are also in the list
-        // FIXME: do errors if not in the list
-        int run = CommonReferences.GetEncoding(input[i+0]) * 64 + CommonReferences.GetEncoding(input[i+1]);
+        int hi = CommonReferences.GetEncoding(input[i + 0]);
+        int lo = CommonReferences.GetEncoding(input[i + 1]);
+        if (hi < 0 || lo < 0)
+        {
+          throw new ArgumentException($"Pitch bend segment \"{input[i + 0]}{input[i + 1]}\" (at position {i}) isn't in the encoding dictionary");
+        }
+        int run = hi * 64 + lo;
         if (run >= 2048) run -= 4096;//i know, that IS weird, but that is what we need to work with.
 
         // move over the run we just parsed,
@@ -151,7 +161,9 @@ namespace zuoanqh.UIAL
           while(i < input.Length && input[i] != '#')
           {
             int val = Convert.ToInt32(input[i]) - Convert.ToInt32('0');
-            if (val < 0 || val > 9) { throw new Exception(); }
+            if (val < 0 || val > 9) {
+              throw new ArgumentException($"Pitch bend run length '{input[i]}' (at position {i}) is not a decimal number");
+            }
             length = length * 10 + val;
             i++;
             // now we expect digits, or end of input, or #
@@ -165,7 +177,7 @@ namespace zuoanqh.UIAL
 
         for(int j = 0; j < length; j++)
         {
-          l.AddLast(run);
+          l.Add(run);
         }
       }
 
