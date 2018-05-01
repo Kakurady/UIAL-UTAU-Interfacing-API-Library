@@ -114,7 +114,7 @@ namespace zuoanqh.UIAL
     /// complement format. Repeated segments are replaced with the value and 
     /// the number of repeats.
     /// 
-    /// Sometimes segments that can be run-length encoded are instead 
+    /// Sometimes segments that could have been run-length encoded are instead 
     /// repeated verbatim. Maybe UTAU stores them in a higher resolution
     /// internally?
     /// </remarks>
@@ -122,7 +122,9 @@ namespace zuoanqh.UIAL
     /// <returns></returns>
     public static int[] DecodePitchbends(string PitchbendString)
     {
-
+      // The pitch bend format is probably parsable with a finite automata, but I'm not sure how to
+      // express it in RegEx in a way that makes sense, so here's a handwritten parser
+      
       string input = PitchbendString;
       List<int> l = new List<int>(input.Length / 2);
 
