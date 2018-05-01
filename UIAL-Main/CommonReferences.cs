@@ -104,49 +104,71 @@ namespace zuoanqh.UIAL
     /// <summary>
     /// Decode the string given to resampler's 13th parameter back to pitchbend magnitudes.
     /// </summary>
+    /// <remarks>
+    /// The pitch bend parameter is a kind of run-length encoding, where each
+    /// segment is encoded with two characters in a custom base-64 scheme,
+    /// giving 4096 levels where negative levels are represented in two's
+    /// complement format. Repeated segments are replaced with the value and 
+    /// the number of repeats.
+    /// 
+    /// Sometimes segments that can be run-length encoded are instead 
+    /// repeated verbatim. Maybe UTAU stores them in a higher resolution
+    /// internally?
+    /// </remarks>
     /// <param name="PitchbendString"></param>
     /// <returns></returns>
     public static int[] DecodePitchbends(string PitchbendString)
     {
-      // Step one: segment the string.
-      List<string> segments = new List<string>();
+
+      LinkedList<int> l = new LinkedList<int>();
       string input = PitchbendString;
 
-      while (true)
+      int i = 0;
+      while (i < input.Length)
       {
-        string s = "";
-        if (input.Length < 2) break;
-        if (input.Length > 2 && input[2] == '#')//for repeated cases
+        // Step one: parse a run 
+        // we expect a run to be two characters...
+        if (i+2 > input.Length) { throw new Exception(); }
+
+        // ...that are also in the list
+        // FIXME: do errors if not in the list
+        int run = CommonReferences.GetEncoding(input[i+0]) * 64 + CommonReferences.GetEncoding(input[i+1]);
+        if (run >= 2048) run -= 4096;//i know, that IS weird, but that is what we need to work with.
+
+        // move over the run we just parsed,
+        i += 2;
+        // now we expect another run, a length, or end of input
+
+        // Step two: parse length (if we have one)
+        bool hasLength = false;
+        int length = 0;
+        if (i < input.Length && input[i] == '#')
         {
-          s = Regex.Match(input, @"..#[\d]+").Value;
-          //input = zusp.Drop(input, s.Length + 1);//skip the Item2 "#" mark
-        }//for a "single".
-        else
-        {
-          //s = zusp.Left(input, 2);
-          //input = zusp.Drop(input, s.Length);
+          hasLength = true;
+          // move over the #
+          i++;
+          // now we expect digits
+          while(i < input.Length && input[i] != '#')
+          {
+            int val = Convert.ToInt32(input[i]) - Convert.ToInt32('0');
+            if (val < 0 || val > 9) { throw new Exception(); }
+            length = length * 10 + val;
+            i++;
+            // now we expect digits, or end of input, or #
+          }
+          // now we're either at the next # or at the end of input.
+          i++;
         }
-        segments.Add(s);
+        // now we're at another run, end of input, or one char past end of input.
+
+        if (!hasLength) { length = 1; }
+
+        for(int j = 0; j < length; j++)
+        {
+          l.AddLast(run);
+        }
       }
 
-      // Step two: convert it into a linked list
-      LinkedList<int> l = new LinkedList<int>();
-      foreach (string s in segments)
-      {
-        //convert two-digit code back to an integer.
-        int i = CommonReferences.GetEncoding(s[0]) * 64 + CommonReferences.GetEncoding(s[1]);
-        if (i >= 2048) i -= 4096;//i know, that IS weird, but that is what we need to work with.
-
-        if (s.Contains("#"))//if repeated add that many times.
-        {
-          //for (int j = 0; j < Convert.ToInt32(zusp.Drop(s, 3)); j++)
-          //  l.AddLast(i);
-        }
-        else//else one time.
-          l.AddLast(i);
-      }
-
-      // Step three: convert it into an array.
       return l.ToArray();
     }
 
