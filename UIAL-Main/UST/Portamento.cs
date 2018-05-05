@@ -114,17 +114,17 @@ namespace zuoanqh.UIAL.UST
     /// <summary>
     /// All units in ms, default is 0.
     /// </summary>
-    public double[] PBW;
-    public string PBWText { get { return ""; /*String.Join(" ", PBW.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray());*/ } }
+    public double[] PBW { get { return Segments.Select(x => x.PBW).ToArray(); } }
+    public string PBWText { get { return String.Join(" ", PBW.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray()); } }
     /// <summary>
     /// All units are in 10-cents
     /// </summary>
-    public double[] PBY;
-    public string PBYText { get { return ""; /*String.Join(" ", PBY.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray());*/ } }
+    public double[] PBY { get { return Segments.Select(x => x.PBY).Take(Segments.Count - 1).ToArray(); } }
+    public string PBYText { get { return String.Join(" ", PBY.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray()); } }
 
-    public string[] PBM;
+    public string[] PBM { get { return Segments.Select(x => x.PBM).ToArray(); } }
 
-    public string PBMText { get { return "";/*String.Join(" ", PBM.ToArray());*/ } }
+    public string PBMText { get { return String.Join(" ", PBM.ToArray()); } }
 
     /// <summary>
     /// Returns the change in a given segment of pitchbend line.
@@ -137,16 +137,16 @@ namespace zuoanqh.UIAL.UST
       {
         if (double.IsNaN(PBS[1]))
           throw new InvalidOperationException("Please provide PBS[1] before sampling.");
-        return PBY[0] - PBS[1];
+        return Segments[0].PBY - PBS[1];
         //note this^ does not happen in vanilla, UTAU actually always use previous note's pitch rather than pbs.
         //Hence PBS[1] actually means nothing except for display purpouse in utau. which is a very bad practice.
         //By fixing it, we might make some extreme cases sounds differently, but we think this is for the better.
       }
 
-      if (SegmentIndex < PBW.Length - 1)//middle points. segment 1 is between 2nd and 3rd point, or pby's 0 and 1
-        return PBY[SegmentIndex] - PBY[SegmentIndex - 1];
-      if (SegmentIndex == PBW.Length - 1)//last point ends at 0, hence 0 minus last y
-        return -PBY[PBY.Length - 1];
+      if (SegmentIndex < Segments.Count - 1)//middle points. segment 1 is between 2nd and 3rd point, or pby's 0 and 1
+        return Segments[SegmentIndex].PBY - Segments[SegmentIndex - 1].PBY;
+      if (SegmentIndex == Segments.Count - 1)//last point ends at 0, hence 0 minus last y
+        return -Segments[PBY.Length - 1].PBY;
 
       throw new IndexOutOfRangeException("Segment " + SegmentIndex + " does not exist.");
     }
@@ -191,19 +191,14 @@ namespace zuoanqh.UIAL.UST
 
       while (y.Count < w.Count - 1) y.Add(0);//-1 because last point must be 0 as far as utau's concern, which is stupid.
 
-      //var m = PBM.Split(',').ToList();
+      var m = PBM.Split(',').ToList();
 
-      //while (m.Count < w.Count) m.Add(PBM_S_CURVE);
+      while (m.Count < w.Count) m.Add(PBM_S_CURVE);
 
-      ////initialize segments
-      //for (int i = 0; i < w.Count - 1; i++)//last segment is a special case.
-      //  Segments.Add(new PortamentoSegment(w[i], y[i], m[i]));
-      //Segments.Add(new PortamentoSegment(w[w.Count - 1], 0, m[w.Count - 1]));
-
-      //now fill the virtual arrays.
-      //this.PBW = new VirtualArray<double>((i) => (Segments[i].PBW), (i, v) => Segments[i].PBW = v, () => Segments.Count);
-      //this.PBY = new VirtualArray<double>((i) => (Segments[i].PBY), (i, v) => Segments[i].PBW = v, () => Segments.Count - 1);
-      //this.PBM = new VirtualArray<string>((i) => (Segments[i].PBM), (i, v) => Segments[i].PBM = v, () => Segments.Count);
+      //initialize segments
+      for (int i = 0; i < w.Count - 1; i++)//last segment is a special case.
+        Segments.Add(new PortamentoSegment(w[i], y[i], m[i]));
+      Segments.Add(new PortamentoSegment(w[w.Count - 1], 0, m[w.Count - 1]));
 
     }
 
@@ -226,13 +221,13 @@ namespace zuoanqh.UIAL.UST
       if (time < 0) return 0;//housekeeping
       int seg = 0;//which segment is the required point located
       double rTime = time;//relative time to start of current interval
-      while (rTime > PBW[seg])
+      while (rTime > Segments[seg].PBW)
       {
-        rTime -= PBW[seg];
+        rTime -= Segments[seg].PBW;
         seg++;
-        if (seg >= PBW.Length) return 0;//if we went through the whole thing. no i don't want to write two conditions and check after the loop. too much typing.
+        if (seg >= Segments.Count) return 0;//if we went through the whole thing. no i don't want to write two conditions and check after the loop. too much typing.
       }
-      return curveTypeHandlers[PBM[seg]].Invoke(rTime, PBW[seg], MagnitudeAt(seg));
+      return curveTypeHandlers[Segments[seg].PBM].Invoke(rTime, Segments[seg].PBW, MagnitudeAt(seg));
     }
 
     /// <summary>
@@ -249,7 +244,7 @@ namespace zuoanqh.UIAL.UST
 
     public override string ToString()
     {
-      return /*String.Join("\r\n", ToStringList().ToArray()) +*/ "\r\n";
+      return String.Join("\r\n", ToStringList().Concat(Enumerable.Repeat("", 1)));
     }
   }
 }

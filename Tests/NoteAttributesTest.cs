@@ -113,5 +113,12 @@ namespace zuoanqh.UIAL.Testing
       Assert.IsFalse(e.HasP5);
       Assert.IsFalse(e.HasV5);
     }
+
+    [TestMethod]
+    [Ignore]
+    public void TestPortamento()
+    {
+
+    }
   }
 }
