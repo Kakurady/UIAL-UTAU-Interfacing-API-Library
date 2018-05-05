@@ -32,7 +32,7 @@ namespace zuoanqh.UIAL.UST
     /// <summary>
     /// KNOWN_FLAGS with NO_PARAMETER_FLAGS removed. funny name, i know. now stop cringing lol.
     /// </summary>
-    /// <!-- HAVE_PARAMETER_FLAGS would make more sense. -->
+    /// <!-- WITH_PARAMETER_FLAGS would make more sense. -->
     public static IReadOnlyCollection<string> YES_PARAMETER_FLAGS { get { return (IReadOnlyCollection<string>)yesParamFlags; } }
     private static HashSet<string> yesParamFlags;
 

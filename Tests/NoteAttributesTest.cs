@@ -120,5 +120,11 @@ namespace zuoanqh.UIAL.Testing
     {
 
     }
+    [TestMethod]
+    [Ignore]
+    public void TestVibrato()
+    {
+
+    }
   }
 }
