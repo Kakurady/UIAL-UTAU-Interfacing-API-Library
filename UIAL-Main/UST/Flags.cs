@@ -32,6 +32,7 @@ namespace zuoanqh.UIAL.UST
     /// <summary>
     /// KNOWN_FLAGS with NO_PARAMETER_FLAGS removed. funny name, i know. now stop cringing lol.
     /// </summary>
+    /// <!-- HAVE_PARAMETER_FLAGS would make more sense. -->
     public static IReadOnlyCollection<string> YES_PARAMETER_FLAGS { get { return (IReadOnlyCollection<string>)yesParamFlags; } }
     private static HashSet<string> yesParamFlags;
 
@@ -238,7 +239,7 @@ namespace zuoanqh.UIAL.UST
     {
       List<string> ans = new List<string>();
       string s = input;
-      while (true)
+      while (s != "")
       {
         //find all flags this could be
         string bestMatch = "";
@@ -249,7 +250,7 @@ namespace zuoanqh.UIAL.UST
         if (!bestMatch.Equals(""))
         {//we found a known flag this starts with. cut it out & carry on.
           ans.Add(bestMatch);
-          //s = zusp.Drop(s, bestMatch.Length);
+          s = s.Remove(0, bestMatch.Length);
         }
         else
         {//something unknown. treat the entire thing as a single flag.
@@ -268,21 +269,30 @@ namespace zuoanqh.UIAL.UST
     {
       this.FlagText = Flag;
       var flaglist = new List<Tuple<string, double>>();
+      var flagRegEx = new Regex(@"[A-Za-z]+");
+      
+      // [ws][sign](integral-digits[.[fractional-digits]]|.[fractional-digits])[E[sign]exponential-digits][ws]
+      // FIXME: possible ambiguity between flag 'e' and exponent marker
+      var numberRegEx = new Regex(
+        @" \s* [+-]? ( [0-9,]+(\.[0-9]*)? | \.[0-9]* ) ([eE][+-]?[0-9])? \s* ", RegexOptions.IgnorePatternWhitespace);
 
+      int j = 0;
       string fs = Flag.Trim();
-      while (true)//wait for it.....
+      while (j < fs.Length)//wait for it.....
       {
         if (fs.Equals("")) break;
-        var match = Regex.Match(fs, @"[A-Za-z]+");//extract a letter part that can have multiple flags in it.
+        var match = flagRegEx.Match(fs, j);//extract a letter part that can have multiple flags in it.
         if (match.Success)
         {
-          //fs = zusp.Drop(fs, match.Length);//remove the matched part.
+          System.Diagnostics.Debug.Assert(match.Index == j);
+          j = match.Index + match.Length; //fs = zusp.Drop(fs, match.Length);//remove the matched part.
           var matched = match.Value;
-          var matchnumbers = Regex.Match(fs, "|" /*zusp.RegEx.FLOATING_POINT_NUMBER + "|" + zusp.RegEx.INTEGER*/);//try to extract a floating point number. if fails, try to extract an integer
+          var matchnumbers = numberRegEx.Match(fs, j);//try to extract a floating point number. if fails, try to extract an integer
           if (matchnumbers.Success)
           {
             double flagValue = Convert.ToDouble(matchnumbers.Value);
-            //fs = zusp.Drop(fs, matchnumbers.Length);
+            System.Diagnostics.Debug.Assert(matchnumbers.Index == j);
+            j = matchnumbers.Index + matchnumbers.Length;
 
             //the letter part must be ending with a parameter flag, let's see what's our best match.
             string bestMatch = "";
@@ -292,7 +302,7 @@ namespace zuoanqh.UIAL.UST
 
             if (!bestMatch.Equals(""))
             {//it is one of our known flags with parameter
-              //matched = zusp.DropLast(matched, bestMatch.Length);//leave that out
+              matched = matched.Remove(matched.Length - bestMatch.Length);//leave that out
 
               if (matched.Length > 0)
               {//segment all no-parameter flags before it
