@@ -115,16 +115,16 @@ namespace zuoanqh.UIAL.UST
     /// All units in ms, default is 0.
     /// </summary>
     public double[] PBW;
-    public string PBWText { get { return ""; /*zusp.List(" ", PBW.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray());*/ } }
+    public string PBWText { get { return ""; /*String.Join(" ", PBW.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray());*/ } }
     /// <summary>
     /// All units are in 10-cents
     /// </summary>
     public double[] PBY;
-    public string PBYText { get { return ""; /*zusp.List(" ", PBY.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray());*/ } }
+    public string PBYText { get { return ""; /*String.Join(" ", PBY.Select((s) => (s.Equals(0)) ? ("") : (s + "")).ToArray());*/ } }
 
     public string[] PBM;
 
-    public string PBMText { get { return "";/*zusp.List(" ", PBM.ToArray());*/ } }
+    public string PBMText { get { return "";/*String.Join(" ", PBM.ToArray());*/ } }
 
     /// <summary>
     /// Returns the change in a given segment of pitchbend line.
@@ -172,26 +172,26 @@ namespace zuoanqh.UIAL.UST
       {
         if (!PBS.Contains(";"))//starting y is 0
         {
-          if (!PBS.Contains(","))//don't you just love working with legendary code
+          if (!PBS.Contains(","))//don't you just love working with legacy code
             this.PBS = new double[] { Convert.ToDouble(PBS), double.NaN };
           //else
-          //  this.PBS = zusp.Split(PBS, ",").Select((s) => Convert.ToDouble(s)).ToArray();
+          //  this.PBS = PBS.Split(',').Select((s) => Convert.ToDouble(s)).ToArray();
         }
         //else
-        //  this.PBS = zusp.Split(PBS, ";").Select((s) => Convert.ToDouble(s)).ToArray();
+        //  this.PBS = PBS.Split(";").Select((s) => Convert.ToDouble(s)).ToArray();
       }
 
-      //var w = zusp.SplitAsIs(PBW, ",")
-      //  .Select((s) => (s.Equals("")) ? (0) : (Convert.ToDouble(s)))//empty entries means 0. 
-      //  .ToList();
+      var w = PBW.Split(',')
+        .Select((s) => (s.Equals("")) ? (0) : (Convert.ToDouble(s)))//empty entries means 0. 
+        .ToList();
 
-      //var y = zusp.SplitAsIs(PBY, ",")
-      //  .Select((s) => (s.Equals("")) ? (0) : (Convert.ToDouble(s)))//why though? i wonder.
-      //  .ToList();
+      var y = PBY.Split(',')
+        .Select((s) => (s.Equals("")) ? (0) : (Convert.ToDouble(s)))//why though? i wonder.
+        .ToList();
 
-      //while (y.Count < w.Count - 1) y.Add(0);//-1 because last point must be 0 as far as utau's concern, which is stupid.
+      while (y.Count < w.Count - 1) y.Add(0);//-1 because last point must be 0 as far as utau's concern, which is stupid.
 
-      //var m = zusp.SplitAsIs(PBM, ",").ToList();
+      //var m = PBM.Split(',').ToList();
 
       //while (m.Count < w.Count) m.Add(PBM_S_CURVE);
 
@@ -249,7 +249,7 @@ namespace zuoanqh.UIAL.UST
 
     public override string ToString()
     {
-      return /*zusp.List("\r\n", ToStringList().ToArray()) +*/ "\r\n";
+      return /*String.Join("\r\n", ToStringList().ToArray()) +*/ "\r\n";
     }
   }
 }

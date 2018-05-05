@@ -89,7 +89,7 @@ namespace zuoanqh.UIAL.VB
 
     public override string ToString()
     {
-      return /*zusp.List("\r\n", ToStringList().ToArray()) +*/ "\r\n";
+      return /*String.Join("\r\n", ToStringList().ToArray()) +*/ "\r\n";
     }
   }
 }

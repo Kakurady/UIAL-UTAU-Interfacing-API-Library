@@ -41,7 +41,7 @@ namespace zuoanqh.UIAL.VB
     public OtoAlias(string s)
     {
       //var t = zusp.CutFirst(s, "=");
-      //string[] l = zusp.SplitAsIs(t.Second, ",");
+      //string[] l = t.Second.Split(',');
       //numbers = l.Skip(1).Select(n => Convert.ToDouble(n)).ToArray();
       ////TODO Error Handling: l.length==6
       //FName = t.First;

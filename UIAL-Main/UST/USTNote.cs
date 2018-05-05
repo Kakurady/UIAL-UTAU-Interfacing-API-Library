@@ -300,7 +300,7 @@ namespace zuoanqh.UIAL.UST
     /// <returns></returns>
     public override string ToString()
     {
-      return /*zusp.List("\r\n", ToStringList().ToArray()) +*/ "\r\n";
+      return /*String.Join("\r\n", ToStringList().ToArray()) +*/ "\r\n";
     }
   }
 }

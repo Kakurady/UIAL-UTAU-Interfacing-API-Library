@@ -84,7 +84,7 @@ namespace zuoanqh.UIAL.UST
     /// <param name="VBRText"></param>
     public Vibrato(string VBRText)
     {
-      //Parameters = zusp.SplitAsIs(VBRText, ",")
+      //Parameters = VBRText.Split(',')
       //  .Select((s) => s.Equals("")?0:Convert.ToDouble(s))
       //  .ToArray();
     }
@@ -147,7 +147,7 @@ namespace zuoanqh.UIAL.UST
     /// <returns></returns>
     public override string ToString()
     {
-      return "";/* zusp.List(" ", Parameters);*/
+      return "";/* String.Join(" ", Parameters);*/
     }
   }
 }

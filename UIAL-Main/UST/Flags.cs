@@ -43,11 +43,11 @@ namespace zuoanqh.UIAL.UST
       //this will make a setting file the first time you run it, but wont change anything if there already is values.
       //which means you can ignore utaugrowl or moresampler's flags if you want.
 
-      //SimpleSettings.UseDefaultValue(KEY_ALL_KNOWN_FLAGS, zusp.List(vanilla.Union(moresampler).Union(utaugrowl)));
-      //SimpleSettings.UseDefaultValue(KEY_NO_PARAMETER_FLAGS, zusp.List(new string[] { "G", "W", "N", "Me" }));
+      //SimpleSettings.UseDefaultValue(KEY_ALL_KNOWN_FLAGS, String.Join(vanilla.Union(moresampler).Union(utaugrowl)));
+      //SimpleSettings.UseDefaultValue(KEY_NO_PARAMETER_FLAGS, String.Join(new string[] { "G", "W", "N", "Me" }));
       //
-      //ALL_KNOWN_FLAGS = zusp.Split(SimpleSettings.GetString(KEY_ALL_KNOWN_FLAGS), ", ").ToList();
-      //NO_PARAMETER_FLAGS = zusp.Split(SimpleSettings.GetString(KEY_NO_PARAMETER_FLAGS), ", ").ToList();
+      //ALL_KNOWN_FLAGS = SimpleSettings.GetString(KEY_ALL_KNOWN_FLAGS).Split(", ").ToList();
+      //NO_PARAMETER_FLAGS = SimpleSettings.GetString(KEY_NO_PARAMETER_FLAGS).Split(", ").ToList();
       allFlags = new HashSet<string>(vanilla.Union(moresampler).Union(utaugrowl));
       noParamFlags = new HashSet<string>(new string[] { "G", "W", "N", "Me" });
       yesParamFlags = new HashSet<string>(allFlags.Except(noParamFlags));

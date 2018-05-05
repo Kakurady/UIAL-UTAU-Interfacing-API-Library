@@ -109,7 +109,7 @@ namespace zuoanqh.UIAL.Engine
       */
       get
       {
-            //return new Envelope(zusp.List(",", Args.Skip(4).Take(7)
+            //return new Envelope(String.Join(",", Args.Skip(4).Take(7)
             //  .Union(Enumerable.Repeat("%", 1))
             //  .Union(Args.Skip(12))));
             return new Envelope();
@@ -188,7 +188,7 @@ namespace zuoanqh.UIAL.Engine
       double Tempo, double PreUtteranceAdjusted, double OverlapAdjusted, Envelope Envelope)
     {
       Args = new List<string> { OutputFile, InputFile, STPAdjusted + "", Length + "@" + Tempo + "+" + PreUtteranceAdjusted };
-      var l = new string[] { "" }.ToList() ; /* zusp.Split(Envelope.ToString(), ",").ToList();*/
+      var l = new string[] { "" }.ToList() ; /* Envelope.ToString().Split(',').ToList();*/
       if (l.Count > 7) l.RemoveAt(7);//remove the stupid percent mark
       Args.AddRange(l);
     }

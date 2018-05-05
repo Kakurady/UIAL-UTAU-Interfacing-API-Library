@@ -88,10 +88,12 @@ namespace zuoanqh.UIAL.Testing
       Assert.AreEqual(e.p4, 0);
       Assert.AreEqual(e.p5, 10);
       Assert.AreEqual(e.v5, 100);
+      Assert.AreEqual(e.ToString(), "0,5,35,0,100,100,0,%,0,10,100");
 
       e.RemoveP5();
       Assert.IsFalse(e.HasP5);
       Assert.IsFalse(e.HasV5);
+
       e = new Envelope("0,5,35,0,100,100,0");
       Assert.IsFalse(e.HasPercentMark);
       Assert.IsFalse(e.HasP4);
@@ -105,6 +107,8 @@ namespace zuoanqh.UIAL.Testing
       Assert.IsFalse(e.HasPercentMark);
       Assert.IsTrue(e.HasP5);
       Assert.IsFalse(e.HasV5);
+      Assert.AreEqual(e.ToString(), "0,5,35,0,100,100,0,,0,10");
+
       e = new Envelope("0,5,35,0,100,100,0,%,0");
       Assert.IsFalse(e.HasP5);
       Assert.IsFalse(e.HasV5);

@@ -5,7 +5,10 @@ using System.Linq;
 namespace zuoanqh.UIAL.UST
 {
   /// <summary>
-  /// This class models a envelope. While the entire idea is bizarre, I'm putting down some code to hopefully make your life easier.
+  /// This class models a envelope, which describes change of volume during a note. 
+  /// 
+  /// UTAU uses four/five points to define the envelope, instead of having specific attack/decay/sustain/release (ADSR) phases.
+  /// While the entire idea is bizarre, I'm putting down some code to hopefully make your life easier.
   /// </summary>
   public class Envelope
   {
@@ -129,8 +132,7 @@ namespace zuoanqh.UIAL.UST
     {
       param = new double[10];
 
-      //var ls = zusp.SplitAsIs(Data, ",")
-      var ls = new string[] { }
+      var ls = Data.Split(',')
         .Select((s) => s.Trim()).ToArray();//gotta trim that string
 
       if (ls.Length < 7) throw new ArgumentException("Malformed envelope, have " + ls.Length + " parts only, requires 7 or more.");
@@ -197,7 +199,7 @@ namespace zuoanqh.UIAL.UST
         l.Add(effectiveP4);
       }
 
-      return "";/*zusp.List(",", l.ToArray())*/
+      return String.Join(",", l.ToArray());
     }
   }
 }
