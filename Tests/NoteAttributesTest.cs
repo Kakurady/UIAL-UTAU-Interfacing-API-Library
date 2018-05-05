@@ -126,5 +126,33 @@ namespace zuoanqh.UIAL.Testing
     {
 
     }
+    [TestMethod]
+    public void TestNote()
+    {
+      var s = new string[] {
+        "Length=960", "Lyric=み", "NoteNum=68", "PreUtterance=", "Intensity=92", "Modulation=0", "PBType=5",
+        "PitchBend=-162,-139,-117,-95,-73,-52,-32,-14,2,17,29,38,45,48,49,49,48,46,43,40,36,32,28,23,18,13,8,4,0,-4,-8,-10,-12,-14,-14,-14,-14,-14,-13,-12,-11,-10,-9,-8,-6,-5,-4,-3,-2,-1,-1,-1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0,0,3,7,12,18,26,35,45,56,67,79,92",
+        "PBS=-60", "PBW=106,89,76", "PBStart=-14.0", "PBY=5,-1.4,"
+      };
+      USTNote n = new USTNote(new System.Collections.Generic.List<string>(s));
+      Assert.AreEqual(n.Length, 960);
+      Assert.AreEqual(n.Lyric, "み");
+      Assert.AreEqual(n.IsRest(), false);
+      Assert.AreEqual(n.NoteNum, 68);
+      //Assert.AreEqual(n.FlagText, 68);
+      //Assert.AreEqual(n.VoiceOverlap, 68);
+      //Assert.AreEqual(n.Velocity, 68);
+      //Assert.AreEqual(n.VelocityFactor, 68);
+      //Assert.AreEqual(n.Envelope, 68);
+      //Assert.AreEqual(n.Vibrato, 68);
+      //Assert.AreEqual(n.PreUtterance);
+      Assert.AreEqual(n.Intensity, 92);
+      Assert.AreEqual(n.Modulation, 0);
+      //Assert.AreEqual(n.PBType);
+      Assert.AreEqual(n.Portamento.PBS[0], -60.0);
+      CollectionAssert.AreEqual(n.Portamento.PBW, new double[] { 106, 89, 76 });
+      //Assert.AreEqual(n.PBStart)
+      CollectionAssert.AreEqual(n.Portamento.PBY, new double[] { 5, -1.4 });
+    }
   }
 }
