@@ -154,5 +154,18 @@ namespace zuoanqh.UIAL.Testing
       //Assert.AreEqual(n.PBStart)
       CollectionAssert.AreEqual(n.Portamento.PBY, new double[] { 5, -1.4 });
     }
+    [TestMethod]
+    public void TestReadUST()
+    {
+      var s = new string[] {
+        "[#VERSION]", "UST Version1.2",
+        "[#SETTING]", "Tempo=120.00", "Tracks=1", "ProjectName=New Project", "VoiceDir=%VOICE%uta", "OutFile=", "CacheDir=あ.cache", "Tool1=wavtool.exe", "Tool2=resampler.exe", "Mode2=True",
+        "[#0000]", "Length=480", "Lyric=あ", "NoteNum=60", "Intensity=100", "Modulation=0",
+        "[#TRACKEND]", "" };
+
+      var ust = new USTFile(s);
+
+      Assert.AreEqual(ust.Version, "UST Version1.2");
+    }
   }
 }

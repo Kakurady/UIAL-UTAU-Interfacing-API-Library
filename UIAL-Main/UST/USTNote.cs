@@ -235,8 +235,8 @@ namespace zuoanqh.UIAL.UST
       //this.TextRaw = list;
       this.attributes = new Dictionary<string, string>(
           list.ToDictionary(
-            x => x.Substring(0, x.IndexOf('=')),
-            x => x.Substring(x.IndexOf('=') + 1)
+            line => line.Substring(0, line.IndexOf('=')),
+            line => line.Substring(line.IndexOf('=') + 1)
           )
       );
       this.Envelope = attributes.ContainsKey(KEY_ENVELOPE) ? new Envelope(attributes[KEY_ENVELOPE]):new Envelope();

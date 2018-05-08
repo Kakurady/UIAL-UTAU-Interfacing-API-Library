@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace zuoanqh.UIAL.UST
 {
@@ -34,40 +37,40 @@ namespace zuoanqh.UIAL.UST
     /// </summary>
     public string Version;
 
-    ///// <summary>
-    ///// Or BPM.
-    ///// </summary>
-    //public double Tempo { get { return ProjectInfo.GetAsDouble(KEY_TEMPO); } set { ProjectInfo.Set(KEY_TEMPO, value); } }
-    ///// <summary>
-    ///// Note this is useless on windows. we do however, provide a method converting multi-track files to multiple usts.
-    ///// </summary>
-    ////public int Tracks;
-    //public string ProjectName { get { return ProjectInfo.Get(KEY_PROJECT_NAME); } set { ProjectInfo.Set(KEY_PROJECT_NAME, value); } }
-    ///// <summary>
-    ///// See class comment for directory meaning.
-    ///// </summary>
-    //public string VoiceDir { get { return ProjectInfo.Get(KEY_VOICE_DIR); } set { ProjectInfo.Set(KEY_VOICE_DIR, value); } }
-    ///// <summary>
-    ///// See class comment for directory meaning.
-    ///// </summary>
-    //public string OutFile { get { return ProjectInfo.Get(KEY_OUT_FILE); } set { ProjectInfo.Set(KEY_OUT_FILE, value); } }
-    ///// <summary>
-    ///// See class comment for directory meaning.
-    ///// </summary>
-    //public string CacheDir { get { return ProjectInfo.Get(KEY_CACHE_DIR); } set { ProjectInfo.Set(KEY_CACHE_DIR, value); } }
-    ///// <summary>
-    ///// The wavtool used.
-    ///// </summary>
-    //public string Tool1 { get { return ProjectInfo.Get(KEY_TOOL1); } set { ProjectInfo.Set(KEY_TOOL1, value); } }
-    ///// <summary>
-    ///// The sampler used.
-    ///// </summary>
-    //public string Tool2 { get { return ProjectInfo.Get(KEY_TOOL2); } set { ProjectInfo.Set(KEY_TOOL2, value); } }
-    ///// <summary>
-    ///// Whether the project is in edit mode 2.
-    ///// <para />You probably want this to be true since mode 2 is the newer edit mode for UTAU. 
-    ///// </summary>
-    //public bool Mode2 { get { return ProjectInfo.GetAsBoolean(KEY_MODE2); } set { ProjectInfo.Set(KEY_MODE2, value); } }
+    /// <summary>
+    /// Or BPM.
+    /// </summary>
+    public double Tempo { get { return Convert.ToDouble(ProjectInfo[KEY_TEMPO]); } set { ProjectInfo[KEY_TEMPO] = Convert.ToString(value); } }
+    /// <summary>
+    /// Note this is useless on windows. we do however, provide a method converting multi-track files to multiple usts.
+    /// </summary>
+    //public int Tracks;
+    public string ProjectName { get { return ProjectInfo[KEY_PROJECT_NAME]; } set { ProjectInfo[KEY_PROJECT_NAME] = value; } }
+    /// <summary>
+    /// See class comment for directory meaning.
+    /// </summary>
+    public string VoiceDir { get { return ProjectInfo[KEY_VOICE_DIR]; } set { ProjectInfo[KEY_VOICE_DIR] = value; } }
+    /// <summary>
+    /// See class comment for directory meaning.
+    /// </summary>
+    public string OutFile { get { return ProjectInfo[KEY_OUT_FILE]; } set { ProjectInfo[KEY_OUT_FILE] = value; } }
+    /// <summary>
+    /// See class comment for directory meaning.
+    /// </summary>
+    public string CacheDir { get { return ProjectInfo[KEY_CACHE_DIR]; } set { ProjectInfo[KEY_CACHE_DIR] = value; } }
+    /// <summary>
+    /// The wavtool used.
+    /// </summary>
+    public string Tool1 { get { return ProjectInfo[KEY_TOOL1]; } set { ProjectInfo[KEY_TOOL1] = value; } }
+    /// <summary>
+    /// The sampler used.
+    /// </summary>
+    public string Tool2 { get { return ProjectInfo[KEY_TOOL2]; } set { ProjectInfo[KEY_TOOL2] = value; } }
+    /// <summary>
+    /// Whether the project is in edit mode 2.
+    /// <para />You probably want this to be true since mode 2 is the newer edit mode for UTAU. 
+    /// </summary>
+    public bool Mode2 { get { return Convert.ToBoolean(ProjectInfo[KEY_MODE2]); } set { ProjectInfo[KEY_MODE2] = Convert.ToString(value); } }
 
 
 
@@ -100,6 +103,24 @@ namespace zuoanqh.UIAL.UST
       //: this(ByLineFileIO.ReadFileNoWhitespace(fPath, zuio.GetEncUde(fPath,8192, Encoding.GetEncoding("Shift_JIS"))).ToArray())
     { }
 
+    private struct USTIniSection
+    {
+      public string header;
+      /// <summary>Line number of beginning of section content (Inclusive)</summary>
+      public int startLine;
+      /// <summary>Line number of end of section content (Exclusive)</summary>
+      public int endLine;
+
+      public int Length { get { return endLine - startLine; } }
+
+      public USTIniSection(string header, int startLine, int endLine)
+      {
+        this.header = header;
+        this.startLine = startLine;
+        this.endLine = endLine;
+      }
+    }
+
     /// <summary>
     /// Creates a ust from string array.
     /// </summary>
@@ -108,32 +129,82 @@ namespace zuoanqh.UIAL.UST
     {
       TrackData = new List<List<USTNote>>();
 
-      ////split by tracks first. yes, that exists.
-      ////thank you c# for providing @.. escaping more escape character is just...
-      //List<List<string>> tracks = zusp.ListSplit(data.ToList(), @"\[#TRACKEND\]");
-      //List<List<string>> ls = zusp.ListSplit(tracks[0], @"\[#.*\]");
+      var lines = new List<string>(data);
 
-      ////ls[0] is ust version, we only handled the newest.
-      //Version = ls[0][0];
-      ////ls[1] is other project info
-      ////ProjectInfo = new DictionaryDataObject(zusp.ListToDictionary(ls[1], "="));
+      // split by sections first
+      USTIniSection preamble = new USTIniSection("", 0, data.Length); // not used.
+      List<USTIniSection> sections = new List<USTIniSection>();
+      for (int i = 0; i < data.Length; i++)
+      {
+        //thank you c# for providing @.. escaping more escape character is just...
+        var match = Regex.Match(data[i], @"^\[#.*\]$");
+        if (match.Success)
+        {
+          // special case: 
+          if (sections.Count == 0)
+          {
+            preamble.endLine = i;
+          }
+          else
+          {
+            // modify the last section
+            // why are List<T> and Stack<T> separate classes?
+            var lastSection = sections[sections.Count - 1];
+            lastSection.endLine = i;
+            sections[sections.Count - 1] = lastSection;
+          }
+          sections.Add(new USTIniSection(data[i], i + 1, data.Length));
+        }
+      }
+      //section[0] is ust version, we only handled the newest.
+      Debug.Assert(sections[0].header == "[#VERSION]", "UST's first section isn't [#VERSION]");
+      Version = data[sections[0].startLine];
+      //section[1] is other project info
+      Debug.Assert(sections[1].header == "[#SETTING]", "UST's second section isn't [#SETTING]");
+      ProjectInfo = new Dictionary<string, string>(
+        lines
+        .Skip(sections[1].startLine)
+        .Take(sections[1].Length)
+        .Where(line => line.Contains('='))
+        .ToDictionary(
+            line => line.Substring(0, line.IndexOf('=')),
+            line => line.Substring(line.IndexOf('=') + 1)
+          )
+        );
 
-      //TrackData.Add(new List<USTNote>());
-      ////rest of it is notes of this ust.
-      //for (int i = 2; i < ls.Count; i++)
-      //{
-      //  int notenum = i - 2; //LI:when i is 2, it's note 0
-      //  TrackData[0].Add(new USTNote(ls[i]));
-      //}
-      //if (tracks.Count > 1)//yes there can be more than 1 tracks. not on windows versions though!
-      //  foreach (var t in tracks.Skip(1))//much better code after those special cases are gone now...
-      //    TrackData.Add(zusp.ListSplit(t, @"\[*\]").Select((n) => new USTNote(n)).ToList());
+      {
+        List<USTNote> track = new List<USTNote>(sections.Count - 3); // the common case is only one track
+        foreach (var section in sections.Skip(2))
+        {
+          if (section.header == "[#TRACKEND]")
+          {
+            TrackData.Add(track);
+            track = new List<USTNote>(0); // more than one track is uncommon, so leaving capacity as empty as we're likely throwing this List away.
+            // yes there can be more than 1 tracks. not on windows versions though!
+          }
+          else
+          {
+            var noteLines = lines.GetRange(section.startLine, section.Length);
+            track.Add(new USTNote(noteLines));
+          }
+        }
+        // unexpected case: notes not followed by [#TRACKEND]
+        if (track.Count > 0)
+        {
+          TrackData.Add(track);
+        }
+        // unexpected case: no [#TRACKEND] at all
+        if (TrackData.Count == 0)
+        {
+          TrackData.Add(new List<USTNote>());
+        }
+      }
 
-      ////now we need to fix portamentos if any.
-      //foreach (var track in TrackData)
-      //  for (int i = 1; i < track.Count; i++)//sliding window of i-1, i
-      //    if (track[i].Portamento != null && !track[i].Portamento.HasValidPBS1())//note this is [i-1] - [i] because it's relative to [i]
-      //      track[i].Portamento.PBS[1] = track[i - 1].NoteNum - track[i].NoteNum;
+      //now we need to fix portamentos if any.
+      foreach (var track in TrackData)
+        for (int i = 1; i < track.Count; i++)//sliding window of i-1, i
+          if (track[i].Portamento != null && !track[i].Portamento.HasValidPBS1())//note this is [i-1] - [i] because it's relative to [i]
+            track[i].Portamento.PBS[1] = track[i - 1].NoteNum - track[i].NoteNum;
     }
 
     /// <summary>
@@ -171,6 +242,13 @@ namespace zuoanqh.UIAL.UST
       : this(Version, ProjectInfo, MakeTrackData(Notes))
     { }
 
+    //FIXME make a constructor to make an empty USTFile
+    public USTFile()
+      : this("blahblah Version Blah", new Dictionary<string, string>(), MakeTrackData(new List<USTNote>()))
+    {
+      throw new NotImplementedException();
+    }
+
     public USTFile(USTFile that)
       : this(that.Version, that.ProjectInfo, that.TrackData)
     { }
@@ -182,7 +260,7 @@ namespace zuoanqh.UIAL.UST
     public List<string> ToStringList()
     {
       var ans = new List<string> { "[#VERSION]", Version, "[#SETTING]" };
-      //ans.AddRange(ProjectInfo.ToStringList("="));
+      ans.AddRange(ProjectInfo.Select(kv => kv.Key + "=" + kv.Value));
 
       foreach (var Notes in TrackData)//adding notes for each track.
       {
@@ -190,13 +268,12 @@ namespace zuoanqh.UIAL.UST
         {
           USTNote n = Notes[i];
           string s = "" + i;
-          while (s.Length < 4) s = "0" + s;
-          ans.Add("[#" + s + "]");
-          foreach (var l in n.ToStringList())
-            ans.Add(l);
+          ans.Add("[#" + s.PadLeft(4, '0') + "]");
+          ans.AddRange(n.ToStringList());
         }
         ans.Add("[#TRACKEND]");
       }
+      ans.Add("");
       return ans;
     }
 
@@ -206,7 +283,7 @@ namespace zuoanqh.UIAL.UST
     /// <returns></returns>
     public override string ToString()
     {
-      return/* String.Join("\r\n", ToStringList().ToArray()) +*/ "\r\n";
+      return String.Join("\r\n", ToStringList().ToArray()) + "\r\n";
     }
   }
 }
