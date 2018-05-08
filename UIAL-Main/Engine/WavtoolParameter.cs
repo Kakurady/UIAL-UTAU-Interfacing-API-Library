@@ -109,10 +109,9 @@ namespace zuoanqh.UIAL.Engine
       */
       get
       {
-            //return new Envelope(String.Join(",", Args.Skip(4).Take(7)
-            //  .Union(Enumerable.Repeat("%", 1))
-            //  .Union(Args.Skip(12))));
-            return new Envelope();
+        return new Envelope(String.Join(",", Args.Skip(4).Take(7)
+          .Union(Enumerable.Repeat("%", 1))
+          .Union(Args.Skip(12))));
       }
       set
       {
@@ -127,15 +126,20 @@ namespace zuoanqh.UIAL.Engine
     /// </summary>
     public double Length
     {//This is the first one.
-      get { return 1;/*return Convert.ToDouble(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").First);*/ }
-      set { /*LengthTempoPreUtteranceAdjusted = value + "@" + zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").Second;*/ }
+      get { return Convert.ToDouble(LengthTempoPreUtteranceAdjusted.Substring(0, LengthTempoPreUtteranceAdjusted.IndexOf('@'))); }
+      set { LengthTempoPreUtteranceAdjusted = value + LengthTempoPreUtteranceAdjusted.Substring(LengthTempoPreUtteranceAdjusted.IndexOf('@') + 1); }
     }
     /// <summary>
     /// Tempo cut out from raw data.
     /// </summary>
     public double Tempo
     {//This is the one in the middle
-      get { return 140;/*Convert.ToDouble(zusp.CutFirst(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "@").Second, "+").First);*/ }
+      get {
+        var at = LengthTempoPreUtteranceAdjusted.IndexOf('@');
+        var plus = LengthTempoPreUtteranceAdjusted.IndexOf('+', at);
+        var substring = LengthTempoPreUtteranceAdjusted.Substring(at + 1, plus - (at + 1));
+        return Convert.ToDouble(substring);
+      }
       set { LengthTempoPreUtteranceAdjusted = Length + "@" + value + "+" + PreUtteranceAdjusted; }
     }
     /// <summary>
@@ -151,8 +155,8 @@ namespace zuoanqh.UIAL.Engine
     /// </summary>
     public double PreUtteranceAdjusted
     {
-      get { return 50; /*Convert.ToDouble(zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "+").Second);*/ }//this is the one after + sign
-      set { /*LengthTempoPreUtteranceAdjusted = zusp.CutFirst(LengthTempoPreUtteranceAdjusted, "+").First + "+" + value;*/ }
+      get { return Convert.ToDouble(LengthTempoPreUtteranceAdjusted.Substring(LengthTempoPreUtteranceAdjusted.IndexOf('+') + 1)); }//this is the one after + sign
+      set { LengthTempoPreUtteranceAdjusted = LengthTempoPreUtteranceAdjusted.Substring(0, LengthTempoPreUtteranceAdjusted.IndexOf('+')) + "+" + value; }
     }
 
     /// <summary>
@@ -188,7 +192,7 @@ namespace zuoanqh.UIAL.Engine
       double Tempo, double PreUtteranceAdjusted, double OverlapAdjusted, Envelope Envelope)
     {
       Args = new List<string> { OutputFile, InputFile, STPAdjusted + "", Length + "@" + Tempo + "+" + PreUtteranceAdjusted };
-      var l = new string[] { "" }.ToList() ; /* Envelope.ToString().Split(',').ToList();*/
+      var l = Envelope.ToString().Split(',').ToList();
       if (l.Count > 7) l.RemoveAt(7);//remove the stupid percent mark
       Args.AddRange(l);
     }
