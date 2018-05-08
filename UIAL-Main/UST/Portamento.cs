@@ -174,11 +174,11 @@ namespace zuoanqh.UIAL.UST
         {
           if (!PBS.Contains(","))//don't you just love working with legacy code
             this.PBS = new double[] { Convert.ToDouble(PBS), double.NaN };
-          //else
-          //  this.PBS = PBS.Split(',').Select((s) => Convert.ToDouble(s)).ToArray();
+          else
+            this.PBS = PBS.Split(',').Select((s) => Convert.ToDouble(s)).ToArray();
         }
-        //else
-        //  this.PBS = PBS.Split(";").Select((s) => Convert.ToDouble(s)).ToArray();
+        else
+          this.PBS = PBS.Split(';').Select((s) => Convert.ToDouble(s)).ToArray();
       }
 
       var w = PBW.Split(',')

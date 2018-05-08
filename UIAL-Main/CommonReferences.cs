@@ -14,13 +14,13 @@ namespace zuoanqh.UIAL
     /// </summary>
     public static readonly double TICKS_PER_BEAT = 480;
 
-    private static readonly double CONVERSION_RATE = 60000 / TICKS_PER_BEAT;
+    private static readonly double TICKMS_PER_BEATMINUTE = 60000 / TICKS_PER_BEAT;
 
     public static double TicksToMilliseconds(double Ticks, double BPM)
-    { return Ticks * CONVERSION_RATE / BPM; }
+    { return Ticks * TICKMS_PER_BEATMINUTE / BPM; }
 
     public static double MillisecondsToTicks(double Milliseconds, double BPM)
-    { return Milliseconds * BPM / CONVERSION_RATE; }
+    { return Milliseconds * BPM / TICKMS_PER_BEATMINUTE; }
 
     /// <summary>
     /// Return the effect of Velocity in multiplier -- 1 means 100%.
